@@ -1,0 +1,12 @@
+[package]
+name = "ghs_games_backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.57"
+serde = { version = "1.0.125", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.11.0", features = ["json"] }
+serde-aux = "3.0.1"
+chrono = "0.4.19"
