@@ -1,0 +1,33 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  caprover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            source:
+              - '**.rs'
+              - '**.Dockerfile'
+              - 'Makefile.toml'
+              - 'Cargo.lock'
+              - '.github/workflows/**'
+      - if: steps.changes.outputs.source == 'true'
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u gleich --password-stdin
+          docker build -t ghcr.io/gleich/ghs_games .
+          docker push ghcr.io/gleich/ghs_games
+      - if: steps.changes.outputs.source == 'true'
+        run: docker run caprover/cli-caprover:v2.1.1 caprover deploy --caproverUrl https://api.mattglei.ch --caproverPassword ${{ secrets.CAPROVER_PASSWORD }} --caproverApp ghs-games --imageName ghcr.io/gleich/ghs_games
+
