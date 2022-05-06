@@ -7,15 +7,16 @@ use reqwest::{
     },
     Client,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_aux::prelude::*;
 use serde_json::Value;
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
 pub struct RawEvent {
     #[serde(rename = "isPostponed")]
     #[serde(deserialize_with = "deserialize_string_from_number")]
-    pub postponed: String, // might be int
+    pub postponed: String,
     #[serde(rename = "Month")]
     pub month: String,
     #[serde(rename = "Year")]
@@ -42,7 +43,7 @@ pub struct RawEvent {
     pub rescheduled_date: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub struct Event {
     pub name: String,
     pub home: bool,
@@ -107,6 +108,8 @@ impl RawEvent {
             return Ok(None);
         }
 
+        dbg!(&self);
+
         Ok(Some(Event {
             name: self.name.to_owned(),
             home: str_to_bool(&self.home),
@@ -129,7 +132,8 @@ impl RawEvent {
             location: self.location.to_owned(),
             rescheduled: !self.rescheduled_date.is_empty(),
             cancelled: str_to_bool(&self.cancelled),
-            rescheduled_date: if self.rescheduled_date.is_empty() {
+            rescheduled_date: if self.rescheduled_date.is_empty() || self.rescheduled_date == "TBA"
+            {
                 None
             } else {
                 Some(NaiveDate::parse_from_str(
