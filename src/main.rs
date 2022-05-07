@@ -1,6 +1,6 @@
 use anyhow::Result;
 use fetch::{Event, RawEvent};
-use rocket::serde::json::Json;
+use rocket::{serde::json::Json, Config};
 use serde::Serialize;
 
 mod fetch;
@@ -62,5 +62,6 @@ async fn current_week() -> Json<APIResult<Vec<Event>>> {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![current_week])
+    let config = Config::figment().merge(("address", "0.0.0.0"));
+    rocket::custom(config).mount("/", routes![current_week])
 }
