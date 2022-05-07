@@ -108,8 +108,6 @@ impl RawEvent {
             return Ok(None);
         }
 
-        dbg!(&self);
-
         Ok(Some(Event {
             name: self.name.to_owned(),
             home: str_to_bool(&self.home),

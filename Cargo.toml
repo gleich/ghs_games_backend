@@ -11,3 +11,4 @@ reqwest = { version = "0.11.0", features = ["json"] }
 serde-aux = "3.0.1"
 chrono = { version = "0.4.19", features = ["serde"] }
 rocket = {version ="0.5.0-rc.1", features=["json"]}
+lazy_static = "1.4.0"
