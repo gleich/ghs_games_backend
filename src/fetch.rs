@@ -7,6 +7,7 @@ use reqwest::{
     },
     Client,
 };
+use rocket::form::validate::Contains;
 use serde::{Deserialize, Serialize};
 use serde_aux::prelude::*;
 use serde_json::Value;
@@ -104,7 +105,7 @@ impl RawEvent {
             }
         }
 
-        if self.event_type != "sport" {
+        if self.event_type != "sport" || self.name.contains("Middle School") || !self.home {
             return Ok(None);
         }
 
