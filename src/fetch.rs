@@ -47,7 +47,6 @@ pub struct RawEvent {
 #[derive(Debug, PartialEq, Serialize)]
 pub struct Event {
     pub name: String,
-    pub home: bool,
     pub time: DateTime<Local>,
     pub sport: String,
     pub varsity: bool,
@@ -105,13 +104,15 @@ impl RawEvent {
             }
         }
 
-        if self.event_type != "sport" || self.name.contains("Middle School") || !self.home {
+        if self.event_type != "sport"
+            || self.name.contains("Middle School")
+            || str_to_bool(&self.home)
+        {
             return Ok(None);
         }
 
         Ok(Some(Event {
             name: self.name.to_owned(),
-            home: str_to_bool(&self.home),
             time: DateTime::parse_from_str(
                 &format!(
                     "{}-{:0>2}-{:0>2} {:0>4} {}",
@@ -146,17 +147,14 @@ impl RawEvent {
 
 #[cfg(test)]
 mod tests {
-    use std::future::Future;
-
     use anyhow::Result;
     use chrono::{DateTime, Local};
 
     use crate::fetch::{Event, RawEvent};
 
-    #[test]
-    async fn fetch_this_weeks() -> Future<Result<()>> {
+    #[tokio::test]
+    async fn fetch_this_weeks() {
         assert!(RawEvent::fetch_this_weeks().await.is_ok());
-        Ok(())
     }
 
     #[test]
@@ -179,7 +177,6 @@ mod tests {
             .clean()?,
             Some(Event {
                 name: String::from("Boys-Girls Varsity Outdoor Track"),
-                home: false,
                 time: DateTime::parse_from_rfc3339("2022-05-03T16:00:00-04:00")?
                     .with_timezone(&Local),
                 sport: String::from("Track"),
