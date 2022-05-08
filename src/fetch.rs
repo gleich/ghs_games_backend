@@ -106,7 +106,7 @@ impl RawEvent {
 
         if self.event_type != "sport"
             || self.name.contains("Middle School")
-            || str_to_bool(&self.home)
+            || !str_to_bool(&self.home)
         {
             return Ok(None);
         }
